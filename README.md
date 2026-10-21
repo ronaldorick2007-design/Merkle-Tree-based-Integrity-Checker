@@ -38,6 +38,19 @@ sudo apt install build-essential libssl-dev
 cc -Wall -Wextra -std=c11 merkle_chain.c -lcrypto -o merkle_chain
 ./merkle_chain
 ```
+## Build on Windows
+MSYS2 (Recommended for MinGW-w64 + OpenSSL)
+## Open the MSYS2 UCRT64 terminal.
+
+Install GCC and OpenSSL packages:
+
+## Bash
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-openssl
+Compile and run:
+
+## Bash
+gcc -Wall -Wextra -std=c11 merkle_chain.c -lcrypto -o merkle_chain.exe
+./merkle_chain.exe
 
 ## Suggested demo
 1. Choose option 1; build 2 blocks with 2 transactions each.
