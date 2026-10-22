@@ -54,7 +54,7 @@ void block_hash(size_t idx, const unsigned char *prev, const unsigned char *root
 }
 
 // Calculates all transaction leaf hashes and repeatedly combines them to produce the Merkle root.
-// O(n), where n is the number of transactions, assuming bounded transaction sizes.
+// O(T), building T no. of parent hashes
 int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsigned char (**leaves)[HS]) {
     if (!n || n > MAX_TX) return 0;
     unsigned char (*lv)[HS] = malloc(n * HS);
@@ -62,14 +62,14 @@ int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsi
     if (!lv) return 0;
     for (size_t i=0;i<n;i++) leaf_hash(tx[i], lv[i]);
     size_t count=n;
-    unsigned char (*cur)[HS] = malloc(count * HS);
+    unsigned char (*cur)[HS] = malloc(count * HS);   //temporary memory
 
     if (!cur) { 
         free(lv); 
         return 0; 
     }
 
-    memcpy(cur, lv, count * HS);
+    memcpy(cur, lv, count * HS);         //temporarily copied leaves to cur
 
     while (count > 1) {
         size_t nn=(count+1)/2;
@@ -86,14 +86,17 @@ int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsi
         }
         free(cur); cur=next; count=nn;
     }
-    memcpy(root,cur[0],HS); free(cur);
-    if (leaves) *leaves=lv;
+
+    //at the end of loop cur is left with only root
+
+    memcpy(root,cur[0],HS); free(cur);   //root copied to inputted "root" argument
+    if (leaves) *leaves=lv;       //leaves copied to inputted "leaves" argument
     else free(lv);
     return 1;
 }
 
 // Displays each level of a block's Merkle tree, including every node hash.
-// O(n), where n is the number of transaction leaf hashes.
+// O(T)
 void show_tree(const Block *b) {
     if(!b) return;
     size_t count=b->tx_count;
@@ -102,7 +105,7 @@ void show_tree(const Block *b) {
         puts("Memory allocation failed."); 
         return; 
     }
-    memcpy(cur,b->leaf_hashes,count*HS);
+    memcpy(cur,b->leaf_hashes,count*HS);      //copying to temporary "cur"
     size_t level=0;
     printf("\nMerkle tree for block #%zu\n",b->index);
     for(;;) {
