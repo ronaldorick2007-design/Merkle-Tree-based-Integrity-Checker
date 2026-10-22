@@ -8,14 +8,23 @@
 #include "integrity.h"
 #include "input.h"
 
+// The standard C libraries and project header files.
+// They connect the main program to the input, blockchain,
+// Merkle tree, and integrity modules.
 
+
+// Builds a chain by collecting blocks and transactions.
 static int build_chain(Chain *c) {
     size_t nblocks;
+    //Ask the user how many blocks they want to create.
     if (!number("How many blocks? ",1,MAX_BLOCKS,&nblocks)) return 0;
     clear_chain(c);
     for (size_t i=0;i<nblocks;i++) {
         char tx[MAX_TX][TX_SIZE]={{0}}; size_t n;
         printf("\n--- Block %zu ---\n",i);
+        
+        // Collect transactions and pass them to the
+        // blockchain module to create and append a block.
         if (!input_txs(tx,&n) || !append_block(c,tx,n)) {
             puts("Build cancelled; partial chain discarded."); clear_chain(c); return 0;
         }
@@ -30,7 +39,11 @@ static void recent_txs(const Chain *c) {
     if(!number("How many recent transactions (1-50)? ",1,50,&wanted)) return;
     size_t shown=0;
     puts("\n=== RECENT TRANSACTIONS ===");
+    
+    // Start from the last block and move backward
+    // using the previous pointer.
     for(Block *b=c->tail;b && shown<wanted;b=b->prev)
+        //Visit transactions in reverse order within each block.
         for(size_t i=b->tx_count;i>0 && shown<wanted;i--) {
             printf("Block #%zu | %s\n",b->index,b->tx[i-1]); shown++;
         }
@@ -54,6 +67,7 @@ int main(void) {
         if(!line("Choose option: ",input,sizeof input)) break;
         char *end=NULL; long choice=strtol(input,&end,10);
         if(!input[0] || end==input || *end) { puts("Invalid menu option."); continue; }
+        // Use switch to execute the selected operation.
         switch(choice) {
             case 1: build_chain(&chain); break;
             case 2: {
