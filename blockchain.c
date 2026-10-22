@@ -10,13 +10,15 @@
 
 void init_chain(Chain *c) { c->head=c->tail=NULL; c->count=0; }
 
-
+//O(B) 
 void clear_chain(Chain *c) {
     Block *b=c->head;
     while (b) { Block *n=b->next; free(b->leaf_hashes); free(b); b=n; }
     init_chain(c);
 }
 
+
+//O(1)  Standard Block creation time
 static Block *make_block(size_t idx, const char tx[][TX_SIZE], size_t n,
                          const unsigned char prev[HS]) {
     Block *b=calloc(1,sizeof *b); if (!b) return NULL;
@@ -26,6 +28,8 @@ static Block *make_block(size_t idx, const char tx[][TX_SIZE], size_t n,
     block_hash(idx,b->prev_hash,b->root,b->hash); return b;
 }
 
+
+//O(1)  Standard Block creation time along with append operation
 int append_block(Chain *c, const char tx[][TX_SIZE], size_t n) {
     if (c->count>=MAX_BLOCKS) { puts("Maximum block count reached."); return 0; }
     unsigned char zero[HS]={0};
@@ -37,11 +41,15 @@ int append_block(Chain *c, const char tx[][TX_SIZE], size_t n) {
     c->tail=b; c->count++; return 1;
 }
 
+
+//O(B)
 Block *find_block(const Chain *c,size_t idx) {
     for(Block *b=c->head;b;b=b->next) if(b->index==idx) return b;
     return NULL;
 }
 
+
+//O(B)
 void show_block(const Block *b) {
     printf("\nBlock #%zu | %zu transaction(s)\n",b->index,b->tx_count);
     for(size_t i=0;i<b->tx_count;i++) printf("  TX %zu: %s\n",i+1,b->tx[i]);
@@ -50,6 +58,8 @@ void show_block(const Block *b) {
     printf("\n  Block hash:    "); hex(b->hash); putchar('\n');
 }
 
+
+//O(B)
 void show_chain(const Chain *c) {
     if(!c->head) { puts("No chain yet. Choose option 1."); return; }
     printf("\n=== CHAIN: %zu BLOCKS ===\n",c->count);
