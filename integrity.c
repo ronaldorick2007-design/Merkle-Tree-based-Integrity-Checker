@@ -23,14 +23,18 @@ int check_integrity(const Chain *c) {
     // Check whether the blockchain exists.
     // Time Complexity: O(1)
 
-    if(!c->head) { puts("Build a chain first."); return 0; }// Ask the user to re-enter transactions in their original order.
+    if(!c->head) { 
+        puts("Build a chain first."); 
+        return 0; }// Ask the user to re-enter transactions in their original order.
 
     puts("\nRe-enter all candidate transactions in original block/order.");
     puts("The stored chain will not be modified.");
     size_t nb;
-    if(!number("Number of candidate blocks: ", 1, MAX_BLOCKS,&nb)) return 0;
+    if(!number("Number of candidate blocks: ", 1, MAX_BLOCKS,&nb)) 
+        return 0;
     int ok = (nb == c->count);
-    if(nb != c->count) printf("Block count mismatch: stored %zu, entered %zu\n", c->count,nb);
+    if(nb != c->count) 
+        printf("Block count mismatch: stored %zu, entered %zu\n", c->count,nb);
     // Initialize the previous-block hash to zero.
     // This represents the starting link for the first block.
     // Time Complexity: O(1), assuming fixed-size hashes.
