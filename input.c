@@ -23,7 +23,9 @@ int number(const char *prompt,size_t min,size_t max,size_t *out) {
     *out=(size_t)v; return 1;
 }
 
+// Collects transaction strings for one block
 int input_txs(char tx[MAX_TX][TX_SIZE],size_t *n) {
+    //Ask for the number of transactions and validate it.
     if (!number("Number of transactions in this block: ",1,MAX_TX,n)) return 0;
     for (size_t i=0;i<*n;i++) {
         char prompt[64]; snprintf(prompt,sizeof prompt,"Transaction %zu: ",i+1);
