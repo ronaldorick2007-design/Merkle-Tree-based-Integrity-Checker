@@ -8,14 +8,6 @@
 #include "integrity.h"
 #include "input.h"
 
-typedef struct Block {
-    size_t index, tx_count;
-    char tx[MAX_TX][TX_SIZE];
-    unsigned char (*leaf_hashes)[HS], root[HS], prev_hash[HS], hash[HS];
-    struct Block *prev, *next;
-} Block;
-typedef struct { Block *head, *tail; size_t count; } Chain;
-
 
 static int build_chain(Chain *c) {
     size_t nblocks;
