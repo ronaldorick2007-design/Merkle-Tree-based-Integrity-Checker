@@ -37,16 +37,6 @@ static void recent_txs(const Chain *c) {
     printf("Displayed %zu transaction(s).\n",shown);
 }
 
-static void help(void) {
-    puts("\nARCHITECTURE:");
-    puts("- Doubly linked list links blocks using prev/next pointers.");
-    puts("- Every block contains multiple transactions.");
-    puts("- Each block has a Merkle tree over its transaction hashes.");
-    puts("- Block hash = SHA256(block index || previous block hash || Merkle root).");
-    puts("- Odd Merkle levels duplicate the final hash; leaf/internal prefixes are distinct.");
-    puts("- Integrity checking re-enters data and compares candidate roots with stored roots.");
-    puts("\nLIMITATIONS: in-memory only; no persistent storage, signatures, networking or consensus.");
-}
 int main(void) {
     Chain chain; init_chain(&chain);
     char input[40];
@@ -60,7 +50,6 @@ int main(void) {
         puts("4. Display a block's Merkle tree");
         puts("5. Retrieve recent transactions");
         puts("6. Check integrity by re-entering data");
-        puts("7. Show architecture / help");
         puts("0. Exit");
         if(!line("Choose option: ",input,sizeof input)) break;
         char *end=NULL; long choice=strtol(input,&end,10);
@@ -83,7 +72,6 @@ int main(void) {
             }
             case 5: recent_txs(&chain); break;
             case 6: check_integrity(&chain); break;
-            case 7: help(); break;
             case 0: clear_chain(&chain); puts("Goodbye."); return 0;
             default: puts("Choose a number from 0 to 7.");
         }
