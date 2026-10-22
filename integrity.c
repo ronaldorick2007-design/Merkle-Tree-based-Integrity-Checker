@@ -6,16 +6,16 @@
 #include "merkle.h"
 #include "input.h"
 /*
- * Function for  check_integrity()
+ * check_integrity()
  * Purpose for this which  Verifies blockchain integrity by comparing user-entered
  * & transactions against the stored blockchain.
  *
  * Time Complexity:
  * O(B^2 + B*T*L), assuming find_block() uses linked-list traversal.
  *B,T,L representation
- * B = Number of stored blocks
- * T = Maximum number of transactions per block
- * L = Maximum characters per transactions*/
+ * B  is the Number of stored blocks
+ * T is the  Maximum number of transactions per block
+ * L is Maximum characters per transactions*/
 
 
 
@@ -61,14 +61,17 @@ int check_integrity(const Chain *c) {
         // Detect extra blocks beyond the stored chain.
         // Time Complexity: O(1)
 
-        if(i>=common) { printf("Block %zu is extra.\n",i); ok=0; continue; }
+        if(i>=common) { 
+            printf("Block %zu is extra.\n",i); ok=0; continue; 
+        }
         // Retrieve the corresponding stored block.
         // Time Complexity: O(B) if find_block() traverses a linked list.
 
         Block *stored=find_block(c,i);
         unsigned char root[HS], bh[HS];
-        if(!stored || !merkle_root(tx,nt,root,NULL)) { ok=0; continue; }
+        if(!stored || ! merkle_root(tx,nt,root,NULL)) { ok=0; continue; }
         block_hash(i,candidate_prev,root,bh);
+        
         // Calculate the candidate block hash using the block index,
         // previous candidate hash, and candidate Merkle root.
         // Time Complexity: O(1), assuming fixed-size hashes.
