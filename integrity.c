@@ -12,9 +12,6 @@
  *
  * Time Complexity:
  * O(B^2 + B*T*L), assuming find_block() uses linked-list traversal.
- *
- * Space Complexity:
- * O(T*L), excluding the existing blockchain.
  *B,T,L representation
  * B = Number of stored blocks
  * T = Maximum number of transactions per block
@@ -111,11 +108,4 @@ static int check_integrity(const Chain *c) {
  * Time Complexity:
  * O(nb * (B + T*L))
  *
- * If nb = B:
- * O(B^2 + B*T*L)
- *
- * Auxiliary Space Complexity:
- * O(T*L)
- 
- 
  */
