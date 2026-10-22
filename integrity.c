@@ -19,7 +19,7 @@
 
 
 
-static int check_integrity(const Chain *c) {
+int check_integrity(const Chain *c) {
     // Check whether the blockchain exists.
     // Time Complexity: O(1)
 
