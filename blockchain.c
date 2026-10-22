@@ -33,11 +33,11 @@ static Block *make_block(size_t idx, const char tx[][TX_SIZE], size_t n, const u
     b->tx_count = n;
     memcpy(b->tx,tx,n*TX_SIZE); 
     memcpy(b->prev_hash,prev,HS);
-    if (!merkle_root(b->tx,n,b->root,&b->leaf_hashes)) { 
+    if (!merkle_root(b->tx, n, b->root, &b->leaf_hashes)) { 
         free(b); 
         return NULL; 
     }
-    block_hash(idx,b->prev_hash,b->root,b->hash); 
+    block_hash(idx, b->prev_hash, b->root, b->hash); 
     return b;
 }
 
