@@ -15,7 +15,7 @@
  *B,T,L representation
  * B = Number of stored blocks
  * T = Maximum number of transactions per block
- * L = Maximum characters per transaction*/
+ * L = Maximum characters per transactions*/
 
 
 
