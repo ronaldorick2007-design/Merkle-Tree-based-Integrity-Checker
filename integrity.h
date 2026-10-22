@@ -1,9 +1,8 @@
+#ifndef INTEGRITY_H  //  It will Prevents multiple inclusions of this header file
+#define INTEGRITY_H  // Defines the header guard
 
-#ifndef INTEGRITY_H
-#define INTEGRITY_H
+#include "common.h"  // Includes the Chain structure definition
 
-#include "common.h"
+int check_integrity(const Chain *c);  //   It Declares the integrity-checking function
 
-int check_integrity(const Chain *c);
-
-#endif
+#endif  //  It will Ends the header guard
