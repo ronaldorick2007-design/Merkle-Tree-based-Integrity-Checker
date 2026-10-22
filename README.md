@@ -1,86 +1,123 @@
-# Merkle-Tree-based-Integrity-Checker
+# Merkle Chain Integrity Checker
 
-Menu-driven educational DSA case study using C and OpenSSL SHA-256.
+A menu-driven C project demonstrating Merkle trees, SHA-256 hashing, a doubly linked block chain, recent-transaction retrieval, and integrity checking. The chain is stored in memory and is lost when the program exits.
 
-## Features
-1. Build a chain by entering multiple blocks, each with multiple transactions.
-2. Add a new block to the chain.
-3. Display all blocks, transactions, Merkle roots, previous hashes, and block hashes.
-4. Display the Merkle tree for a selected block.
-5. Retrieve the most recent N transactions.
-6. Check integrity by re-entering candidate data in the original order.
-7. Display architecture notes.
+## Project files
 
-## Data structure design
-- Blocks are connected in memory as a **doubly linked list** (`prev` and `next` pointers).
-- Every block contains several transaction strings.
-- Every block has its own binary Merkle tree over those transactions.
-- Each block hash commits to its index, previous block hash and Merkle root.
-- This reflects the common blockchain pattern: a block links to its predecessor, while its Merkle root commits to the transactions inside that block. The chain itself is not one Merkle tree.
+The source is split into modules:
 
-## Build on macOS
-Install OpenSSL with Homebrew:
+- `main.c` — menu and application flow
+- `merkle.c` / `merkle.h` — SHA-256 helpers and Merkle-tree operations
+- `blockchain.c` / `blockchain.h` — block creation and doubly linked chain
+- `integrity.c` / `integrity.h` — integrity verification
+- `input.c` / `input.h` — input helpers
+- `common.h` — shared constants and data structures
+
+Keep all `.c` and `.h` files in the same project directory. The commands below compile all implementation files together; do not compile the header files separately.
+
+## Requirements
+
+- A C compiler (Clang or GCC)
+- OpenSSL development files (`libcrypto`)
+
+## Build, compile, and run
+
+Run the commands from the directory containing `main.c`, `merkle.c`, `blockchain.c`, `integrity.c`, and `input.c`.
+
+### macOS
+
+**1. Install dependencies** (requires Homebrew):
+
 ```bash
 brew install openssl@3
 ```
-Apple Silicon example:
+
+**2. Compile:**
+
 ```bash
-clang -Wall -Wextra -std=c11 merkle_chain.c \
-  -I/opt/homebrew/opt/openssl@3/include \
-  -L/opt/homebrew/opt/openssl@3/lib -lcrypto -o merkle_chain
+clang -Wall -Wextra -std=c11 \
+  main.c merkle.c blockchain.c integrity.c input.c \
+  -I"$(brew --prefix openssl@3)/include" \
+  -L"$(brew --prefix openssl@3)/lib" \
+  -lcrypto -o merkle_chain
+```
+
+**3. Run:**
+
+```bash
 ./merkle_chain
 ```
-On Intel Macs, Homebrew may use `/usr/local` instead of `/opt/homebrew`; adjust paths.
 
-## Build on Ubuntu/Linux
+### Linux (Debian/Ubuntu)
+
+**1. Install dependencies:**
+
 ```bash
+sudo apt update
 sudo apt install build-essential libssl-dev
-cc -Wall -Wextra -std=c11 merkle_chain.c -lcrypto -o merkle_chain
+```
+
+**2. Compile:**
+
+```bash
+cc -Wall -Wextra -std=c11 \
+  main.c merkle.c blockchain.c integrity.c input.c \
+  -lcrypto -o merkle_chain
+```
+
+**3. Run:**
+
+```bash
 ./merkle_chain
 ```
-## Build on Windows
-MSYS2 (Recommended for MinGW-w64 + OpenSSL)
-## Open the MSYS2 UCRT64 terminal.
 
-Install GCC and OpenSSL packages:
+### Windows (MSYS2 UCRT64)
 
-## Bash
-pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-openssl
-Compile and run:
+**1. Install MSYS2** from <https://www.msys2.org/> and open the **MSYS2 UCRT64** terminal from the Start menu.
 
-## Bash
-gcc -Wall -Wextra -std=c11 merkle_chain.c -lcrypto -o merkle_chain.exe
+**2. Install the compiler and OpenSSL:**
+
+```bash
+pacman -S --needed mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-openssl
+```
+
+**3. Change to the project directory.** Replace the example path with your actual folder path:
+
+```bash
+cd /c/Users/YourName/path/to/merkle_chain_integrity_checker
+```
+
+**4. Compile:**
+
+```bash
+gcc -Wall -Wextra -std=c11 \
+  main.c merkle.c blockchain.c integrity.c input.c \
+  -o merkle_chain.exe -lcrypto
+```
+
+**5. Run:**
+
+```bash
 ./merkle_chain.exe
+```
 
-## Suggested demo
-1. Choose option 1; build 2 blocks with 2 transactions each.
-2. Choose option 3 to show the linked blocks and hashes.
-3. Choose option 4 and display Block 0's Merkle tree.
-4. Choose option 5 and request the most recent 3 transactions.
-5. Choose option 6 and re-enter all transactions exactly as before. Expected result: `INTEGRITY VERIFIED`.
-6. Choose option 6 again, changing one character in one transaction. Expected result: `INTEGRITY CHECK FAILED`.
-7. Choose option 2 to add a block and show that it links to the prior block hash.
+Use the **MSYS2 UCRT64** terminal for the Windows commands so GCC can locate the OpenSSL headers and library.
+
+## Research references
+
+See [`RESEARCH_PAPERS.md`](RESEARCH_PAPERS.md) for foundational papers and specifications on Merkle trees, authenticated data structures, and tamper-evident logs.
 
 ## Important limitations
-- The chain exists only in memory and is lost on exit.
+
+- The chain exists only in memory and is lost when the program exits.
 - The trusted reference is the original chain in memory. This demo does not authenticate an external root, persist data, sign blocks, or implement a consensus/network protocol.
 - The integrity check re-enters all transactions in the same order and independently recomputes candidate Merkle roots and block hashes. The stored chain is not replaced.
-- Leaf hashes use `SHA256(0x00 || transaction)`, and internal hashes use `SHA256(0x01 || left_hash || right_hash)`. If a level has an odd number of nodes, the last hash is duplicated. Exact conventions must be shared by builder and verifier.
+- Leaf hashes use `SHA256(0x00 || transaction)`, and internal hashes use `SHA256(0x01 || left_hash || right_hash)`. If a level has an odd number of nodes, the last hash is duplicated. The builder and verifier must use the same conventions.
 - This is a teaching project, not production blockchain software.
 
 ## Real-world references
-- Bitcoin developer reference: https://bitcoin.org/en/developer-reference#merkle-trees
-- Git object model: https://git-scm.com/book/en/v2/Git-Internals-Git-Objects
-- IPFS Merkle DAG specification: https://github.com/ipfs/specs/blob/main/MERKLE_DAG.md
-- C Merkle-tree library reference: https://github.com/isec-tugraz/merkle-tree
 
-## Suggested genuine commit plan
-1. Define block/chain structures and menu.
-2. Implement SHA-256 leaf and parent hashing.
-3. Implement Merkle-root construction.
-4. Implement block creation and previous-hash linkage.
-5. Implement display and recent-transaction retrieval.
-6. Implement integrity verification.
-7. Test edge cases and document design/limitations.
-
-Make commits as the work is developed; don't fabricate contribution history.
+- Bitcoin Developer Reference — [Merkle trees](https://bitcoin.org/en/developer-reference#merkle-trees)
+- Git object model — [Git Internals: Git Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects)
+- IPFS — [Merkle DAG specification](https://github.com/ipfs/specs/blob/main/MERKLE_DAG.md)
+- C Merkle-tree library — [isec-tugraz/merkle-tree](https://github.com/isec-tugraz/merkle-tree)
