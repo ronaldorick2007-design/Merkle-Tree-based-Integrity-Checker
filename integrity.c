@@ -28,15 +28,15 @@ int check_integrity(const Chain *c) {
     puts("\nRe-enter all candidate transactions in original block/order.");
     puts("The stored chain will not be modified.");
     size_t nb;
-    if(!number("Number of candidate blocks: ",1,MAX_BLOCKS,&nb)) return 0;
-    int ok=(nb==c->count);
-    if(nb!=c->count) printf("Block count mismatch: stored %zu, entered %zu\n",c->count,nb);
+    if(!number("Number of candidate blocks: ", 1, MAX_BLOCKS,&nb)) return 0;
+    int ok = (nb == c->count);
+    if(nb != c->count) printf("Block count mismatch: stored %zu, entered %zu\n", c->count,nb);
     // Initialize the previous-block hash to zero.
     // This represents the starting link for the first block.
     // Time Complexity: O(1), assuming fixed-size hashes.
 
     unsigned char candidate_prev[HS]={0};
-    size_t common=nb<c->count?nb:c->count;
+    size_t common = nb < c->count ? nb : c->count;
     /*
      * Process each candidate block.
      *
@@ -46,11 +46,11 @@ int check_integrity(const Chain *c) {
      * merkle_root(): O(T*L), assuming transaction hashing is
      *                proportional to the total transaction length.
      *
-     * Total loop complexity:
+     * Total time complexity:
      * O(nb * (B + T*L))
      */
 
-    for(size_t i=0;i<nb;i++) {
+    for(size_t i=0; i < nb; i++) {
         
         // Store candidate transactions for the current block.
         // Space Complexity: O(T*L)
@@ -73,12 +73,12 @@ int check_integrity(const Chain *c) {
         // previous candidate hash, and candidate Merkle root.
         // Time Complexity: O(1), assuming fixed-size hashes.
 
-        int count_ok=(nt==stored->tx_count);
-        int root_ok=count_ok && memcmp(root,stored->root,HS)==0;
+        int count_ok=(nt == stored->tx_count);
+        int root_ok = count_ok && memcmp(root, stored->root, HS) == 0;
         // Verify the previous-block link.
         // Time Complexity: O(1), because HS is fixed.
-        int prev_ok=memcmp(stored->prev_hash,candidate_prev,HS)==0;
-        int hash_ok=memcmp(bh,stored->hash,HS)==0;
+        int prev_ok = memcmp(stored->prev_hash, candidate_prev, HS) == 0;
+        int hash_ok = memcmp(bh, stored->hash, HS) == 0;
         // Display the transaction count verification result.
         // Time Complexity: O(1)
 
@@ -95,7 +95,7 @@ int check_integrity(const Chain *c) {
     // Return 1 if integrity is verified; otherwise, return 0.
     // Time Complexity: O(1)
 
-    return ok && nb==c->count;
+    return ok && nb == c->count;
 }
 /*
  * FINAL COMPLEXITY ANALYSIS
