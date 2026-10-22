@@ -5,14 +5,12 @@
 
 #include "merkle.h"
 
-// Function: sha
 // Purpose: Calculates the SHA-256 hash of the given input data.
 // Time Complexity: O(n), where n is the input size in bytes.
 void sha(const unsigned char *p, size_t n, unsigned char out[HS]) {
     SHA256(p, n, out);
 }
 
-// Function: leaf_hash
 // Purpose: Calculates the hash of a transaction using a 0-byte prefix.
 // Time Complexity: O(n), where n is the transaction length.
 static void leaf_hash(const char *s, unsigned char out[HS]) {
@@ -28,7 +26,6 @@ static void leaf_hash(const char *s, unsigned char out[HS]) {
     free(p);
 }
 
-// Function: parent_hash
 // Purpose: Combines two child hashes and calculates their parent hash using a 1-byte prefix.
 // Time Complexity: O(1), because the input size is fixed.
 void parent_hash(const unsigned char *a, const unsigned char *b, unsigned char out[HS]) {
@@ -39,14 +36,12 @@ void parent_hash(const unsigned char *a, const unsigned char *b, unsigned char o
     sha(p, sizeof p, out);
 }
 
-// Function: hex
 // Purpose: Prints a hash as a hexadecimal string.
 // Time Complexity: O(1), because HS is a fixed constant.
 void hex(const unsigned char *h) {
     for (int i=0;i<HS;i++) printf("%02x", h[i]);
 }
 
-// Function: block_hash
 // Purpose: Calculates a block hash using the block index, previous block hash, and Merkle root.
 // Time Complexity: O(1), because the input buffer has a fixed size.
 void block_hash(size_t idx, const unsigned char *prev, const unsigned char *root, unsigned char out[HS]) {
@@ -58,9 +53,7 @@ void block_hash(size_t idx, const unsigned char *prev, const unsigned char *root
     sha(p, sizeof p, out);
 }
 
-// Function: merkle_root
 // Purpose: Calculates all transaction leaf hashes and repeatedly combines them to produce the Merkle root.
-// Returns: 1 on success, 0 on failure.
 // Time Complexity: O(n), where n is the number of transactions, assuming bounded transaction sizes.
 int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsigned char (**leaves)[HS]) {
     if (!n || n > MAX_TX) return 0;
@@ -99,7 +92,6 @@ int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsi
     return 1;
 }
 
-// Function: show_tree
 // Purpose: Displays each level of a block's Merkle tree, including every node hash.
 // Time Complexity: O(n), where n is the number of transaction leaf hashes.
 void show_tree(const Block *b) {
