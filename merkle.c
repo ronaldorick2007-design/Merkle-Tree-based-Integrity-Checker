@@ -4,15 +4,15 @@
 #include <openssl/sha.h>
 
 #include "merkle.h"
-
-// Purpose: Calculates the SHA-256 hash of the given input data.
-// Time Complexity: O(n), where n is the input size in bytes.
+//wrapper function
+// Calculates the SHA-256 hash of the given input data.
+// O(n), where n is the input size in bytes.
 void sha(const unsigned char *p, size_t n, unsigned char out[HS]) {
     SHA256(p, n, out);
 }
 
-// Purpose: Calculates the hash of a transaction using a 0-byte prefix.
-// Time Complexity: O(n), where n is the transaction length.
+// Calculates the hash of a transaction using a 0-byte prefix.
+// O(n), where n is the transaction length.
 static void leaf_hash(const char *s, unsigned char out[HS]) {
     size_t n = strlen(s);
     unsigned char *p = malloc(n + 1);
@@ -26,8 +26,8 @@ static void leaf_hash(const char *s, unsigned char out[HS]) {
     free(p);
 }
 
-// Purpose: Combines two child hashes and calculates their parent hash using a 1-byte prefix.
-// Time Complexity: O(1), because the input size is fixed.
+// Combines two child hashes and calculates their parent hash using a 1-byte prefix.
+// O(1), because the input size is fixed.
 void parent_hash(const unsigned char *a, const unsigned char *b, unsigned char out[HS]) {
     unsigned char p[1 + 2 * HS];
     p[0] = 1;
@@ -36,14 +36,14 @@ void parent_hash(const unsigned char *a, const unsigned char *b, unsigned char o
     sha(p, sizeof p, out);
 }
 
-// Purpose: Prints a hash as a hexadecimal string.
-// Time Complexity: O(1), because HS is a fixed constant.
+// Prints a hash as a hexadecimal string.
+// O(1), because HS is a fixed constant.
 void hex(const unsigned char *h) {
     for (int i=0;i<HS;i++) printf("%02x", h[i]);
 }
 
-// Purpose: Calculates a block hash using the block index, previous block hash, and Merkle root.
-// Time Complexity: O(1), because the input buffer has a fixed size.
+// Calculates a block hash using the block index, previous block hash, and Merkle root.
+// O(1), because the input buffer has a fixed size.
 void block_hash(size_t idx, const unsigned char *prev, const unsigned char *root, unsigned char out[HS]) {
     unsigned char p[8 + 2 * HS];
     uint64_t x = (uint64_t)idx;
@@ -53,8 +53,8 @@ void block_hash(size_t idx, const unsigned char *prev, const unsigned char *root
     sha(p, sizeof p, out);
 }
 
-// Purpose: Calculates all transaction leaf hashes and repeatedly combines them to produce the Merkle root.
-// Time Complexity: O(n), where n is the number of transactions, assuming bounded transaction sizes.
+// Calculates all transaction leaf hashes and repeatedly combines them to produce the Merkle root.
+// O(n), where n is the number of transactions, assuming bounded transaction sizes.
 int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsigned char (**leaves)[HS]) {
     if (!n || n > MAX_TX) return 0;
     unsigned char (*lv)[HS] = malloc(n * HS);
@@ -92,8 +92,8 @@ int merkle_root(const char tx[][TX_SIZE], size_t n, unsigned char root[HS], unsi
     return 1;
 }
 
-// Purpose: Displays each level of a block's Merkle tree, including every node hash.
-// Time Complexity: O(n), where n is the number of transaction leaf hashes.
+// Displays each level of a block's Merkle tree, including every node hash.
+// O(n), where n is the number of transaction leaf hashes.
 void show_tree(const Block *b) {
     if(!b) return;
     size_t count=b->tx_count;
