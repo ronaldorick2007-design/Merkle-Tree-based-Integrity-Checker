@@ -64,7 +64,7 @@ int append_block(Chain *c, const char tx[][TX_SIZE], size_t n) {
 }
 
 //O(N)
-//Searchges for a block with its ID in a chain
+//Searches for a block with its ID in a chain
 Block *find_block(const Chain *c,size_t idx) {
     for(Block *b = c->head; b; b = b->next) 
         if(b->index == idx) return b;
@@ -75,7 +75,7 @@ Block *find_block(const Chain *c,size_t idx) {
 // displays block's details
 void show_block(const Block *b) {
     printf("\nBlock #%zu | %zu transaction(s)\n", b->index, b->tx_count);
-    for(size_t i=0; i<b->tx_count; i++) printf("  TX %zu: %s\n", i+1, b->tx[i]);
+    for(size_t i=0; i<b->tx_count; i++) printf("  Transaction %zu: %s\n", i+1, b->tx[i]);
     printf("  Previous hash: "); hex(b->prev_hash);
     printf("\n  Merkle root:   "); hex(b->root);
     printf("\n  Block hash:    "); hex(b->hash);
