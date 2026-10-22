@@ -5,31 +5,86 @@
 #include "blockchain.h"
 #include "merkle.h"
 #include "input.h"
+/*
+ * Function for  check_integrity()
+ * Purpose for this which  Verifies blockchain integrity by comparing user-entered
+ * & transactions against the stored blockchain.
+ *
+ * Time Complexity:
+ * O(B^2 + B*T*L), assuming find_block() uses linked-list traversal.
+ *
+ * Space Complexity:
+ * O(T*L), excluding the existing blockchain.
+ *B,T,L representation
+ * B = Number of stored blocks
+ * T = Maximum number of transactions per block
+ * L = Maximum characters per transaction*/
+
 
 
 static int check_integrity(const Chain *c) {
-    if(!c->head) { puts("Build a chain first."); return 0; }
+    // Check whether the blockchain exists.
+    // Time Complexity: O(1)
+
+    if(!c->head) { puts("Build a chain first."); return 0; }// Ask the user to re-enter transactions in their original order.
+
     puts("\nRe-enter all candidate transactions in original block/order.");
     puts("The stored chain will not be modified.");
     size_t nb;
     if(!number("Number of candidate blocks: ",1,MAX_BLOCKS,&nb)) return 0;
     int ok=(nb==c->count);
     if(nb!=c->count) printf("Block count mismatch: stored %zu, entered %zu\n",c->count,nb);
+    // Initialize the previous-block hash to zero.
+    // This represents the starting link for the first block.
+    // Time Complexity: O(1), assuming fixed-size hashes.
+
     unsigned char candidate_prev[HS]={0};
     size_t common=nb<c->count?nb:c->count;
+    /*
+     * Process each candidate block.
+     *
+     * Number of iterations: nb
+     *
+     * find_block(): O(B) per iteration for linked-list traversal.
+     * merkle_root(): O(T*L), assuming transaction hashing is
+     *                proportional to the total transaction length.
+     *
+     * Total loop complexity:
+     * O(nb * (B + T*L))
+     */
+
     for(size_t i=0;i<nb;i++) {
+        
+        // Store candidate transactions for the current block.
+        // Space Complexity: O(T*L)
+
         char tx[MAX_TX][TX_SIZE]={{0}}; size_t nt;
         printf("\n--- Candidate block %zu ---\n",i);
         if(!input_txs(tx,&nt)) { puts("Invalid input; check stopped."); return 0; }
+        // Detect extra blocks beyond the stored chain.
+        // Time Complexity: O(1)
+
         if(i>=common) { printf("Block %zu is extra.\n",i); ok=0; continue; }
+        // Retrieve the corresponding stored block.
+        // Time Complexity: O(B) if find_block() traverses a linked list.
+
         Block *stored=find_block(c,i);
         unsigned char root[HS], bh[HS];
         if(!stored || !merkle_root(tx,nt,root,NULL)) { ok=0; continue; }
         block_hash(i,candidate_prev,root,bh);
+        // Calculate the candidate block hash using the block index,
+        // previous candidate hash, and candidate Merkle root.
+        // Time Complexity: O(1), assuming fixed-size hashes.
+
         int count_ok=(nt==stored->tx_count);
         int root_ok=count_ok && memcmp(root,stored->root,HS)==0;
+        // Verify the previous-block link.
+        // Time Complexity: O(1), because HS is fixed.
         int prev_ok=memcmp(stored->prev_hash,candidate_prev,HS)==0;
         int hash_ok=memcmp(bh,stored->hash,HS)==0;
+        // Display the transaction count verification result.
+        // Time Complexity: O(1)
+
         printf("Transaction count: %s\n",count_ok?"MATCH":"MISMATCH");
         printf("Merkle root:       %s\n",root_ok?"MATCH":"MISMATCH");
         printf("Previous link:     %s\n",prev_ok?"MATCH":"MISMATCH");
@@ -40,5 +95,27 @@ static int check_integrity(const Chain *c) {
     }
     if(ok && nb==c->count) puts("\nFINAL: INTEGRITY VERIFIED — all data matches.");
     else puts("\nFINAL: INTEGRITY CHECK FAILED — data/order/count differs from stored chain.");
+    // Return 1 if integrity is verified; otherwise, return 0.
+    // Time Complexity: O(1)
+
     return ok && nb==c->count;
 }
+/*
+ * FINAL COMPLEXITY ANALYSIS
+ *
+ * Let:
+ * B = Number of stored blocks
+ * T = Maximum transactions per block
+ * L = Maximum characters per transaction
+ *
+ * Time Complexity:
+ * O(nb * (B + T*L))
+ *
+ * If nb = B:
+ * O(B^2 + B*T*L)
+ *
+ * Auxiliary Space Complexity:
+ * O(T*L)
+ 
+ 
+ */
